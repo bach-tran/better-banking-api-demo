@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConnectionUtility.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">simple-banking-app</a> &gt; <a href="index.source.html" class="el_package">com.revature.dao</a> &gt; <span class="el_source">ConnectionUtility.java</span></div><h1>ConnectionUtility.java</h1><pre class="source lang-java linenums">package com.revature.dao;
+
+import com.revature.Main;
+import com.revature.model.User;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.*;
+import java.util.Properties;
+
+<span class="nc" id="L11">public class ConnectionUtility {</span>
+
+    public static Connection getConnection() throws SQLException, IOException {
+<span class="fc" id="L14">        InputStream props = Main.class.getClassLoader().getResourceAsStream(&quot;database_config.properties&quot;);</span>
+<span class="fc" id="L15">        Properties properties = new Properties();</span>
+<span class="fc" id="L16">        properties.load(props);</span>
+<span class="fc" id="L17">        boolean useH2 = Boolean.parseBoolean(properties.getProperty(&quot;use-h2&quot;));</span>
+
+<span class="pc bpc" id="L19" title="1 of 2 branches missed.">        if (useH2) { // Use H2 in-memory database</span>
+<span class="fc" id="L20">            return DriverManager.getConnection(&quot;jdbc:h2:mem:test&quot;);</span>
+        } else { // Use Postgres database
+<span class="nc" id="L22">            String url = &quot;jdbc:postgresql://database-1.cifwcr7ybkhx.us-east-1.rds.amazonaws.com:5432/postgres&quot;;</span>
+<span class="nc" id="L23">            String username = &quot;postgres&quot;;</span>
+<span class="nc" id="L24">            String password = &quot;password&quot;; // Highly recommend to utilize environment variables to store</span>
+            // database credentials instead of hardcoding
+
+<span class="nc" id="L27">            return DriverManager.getConnection(url, username, password);</span>
+        }
+    }
+
+    public static void populateH2Database(Connection con) throws SQLException, IOException {
+<span class="fc" id="L32">        String createTableSql = &quot;create table bank_users (\n&quot; +</span>
+                &quot;\tid SERIAL primary key,\n&quot; +
+                &quot;\tusername VARCHAR(200) not null unique,\n&quot; +
+                &quot;\tpassword varchar(200) not null,\n&quot; +
+                &quot;\trole varchar(20) not null\n&quot; +
+                &quot;)&quot;;
+
+<span class="fc" id="L39">        String insertUsers = &quot;insert into bank_users (username, password, role)\n&quot; +</span>
+                &quot;values \n&quot; +
+                &quot;('admin123', 'password123', 'admin'),\n&quot; +
+                &quot;('customer123', 'test12345', 'customer')&quot;;
+
+<span class="fc" id="L44">        PreparedStatement ps1 = con.prepareStatement(createTableSql);</span>
+<span class="fc" id="L45">        ps1.executeUpdate();</span>
+
+<span class="fc" id="L47">        PreparedStatement ps2 = con.prepareStatement(insertUsers);</span>
+<span class="fc" id="L48">        ps2.executeUpdate();</span>
+
+//        String selectUsers = &quot;select * from bank_users where username = ? and password = ?&quot;;
+//        PreparedStatement ps3 = con.prepareStatement(selectUsers);
+//        ps3.setString(1, &quot;john_doe&quot;);
+//        ps3.setString(2, &quot;password123&quot;);
+//        ResultSet rs = ps3.executeQuery();
+//
+//        if (rs.next()) {
+//            User user = new User();
+//            user.setId(rs.getInt(&quot;id&quot;));
+//            user.setUsername(rs.getString(&quot;username&quot;));
+//            user.setPassword(rs.getString(&quot;password&quot;));
+//            user.setRole(rs.getString(&quot;role&quot;));
+//
+//            System.out.println(user);
+//        }
+//
+//        UserDAO ud = new UserDAO();
+//        User u1 = ud.findUserByUsernameAndPassword(&quot;john_doe&quot;, &quot;password123&quot;);
+//        System.out.println(u1);
+<span class="fc" id="L69">    }</span>
+
+    // Ideally, a test should NOT rely on another test case. Therefore after each test case, we
+    // want to start from scratch in the H2 database
+    public static void clearH2Database(Connection con) throws SQLException {
+<span class="fc" id="L74">        String sql = &quot;DROP ALL OBJECTS&quot;; // H2 specific</span>
+
+<span class="fc" id="L76">        Statement statement = con.createStatement();</span>
+<span class="fc" id="L77">        statement.executeUpdate(sql);</span>
+<span class="fc" id="L78">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -16,7 +16,7 @@ public class AuthenticationController {
             LoginCredentials credentials = ctx.bodyAsClass(LoginCredentials.class);
 
             if (credentials.getUsername() == null || credentials.getPassword() == null) {
-                ctx.result("username and/or password was not provided!");
+                ctx.json(new Message("username and/or password was not provided!"));
                 ctx.status(400);
             } else {
 
@@ -30,6 +30,7 @@ public class AuthenticationController {
 
                     ctx.json(user);
                 } catch (LoginException e) {
+                    ctx.req().getSession().invalidate();
                     ctx.status(400);
                     ctx.json(new Message(e.getMessage()));
                 }
@@ -47,6 +48,10 @@ public class AuthenticationController {
            } else {
                ctx.json(loggedInUser); // Object -> JSON -> Response body
            }
+        });
+
+        app.post("/logout", (ctx) -> {
+            ctx.req().getSession().invalidate();
         });
     }
 

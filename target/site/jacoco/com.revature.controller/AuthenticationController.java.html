@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthenticationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">simple-banking-app</a> &gt; <a href="index.source.html" class="el_package">com.revature.controller</a> &gt; <span class="el_source">AuthenticationController.java</span></div><h1>AuthenticationController.java</h1><pre class="source lang-java linenums">package com.revature.controller;
+
+import com.revature.dto.LoginCredentials;
+import com.revature.dto.Message;
+import com.revature.exception.LoginException;
+import com.revature.model.User;
+import com.revature.service.UserService;
+import io.javalin.Javalin;
+import jakarta.servlet.http.HttpSession;
+
+<span class="fc" id="L11">public class AuthenticationController {</span>
+
+<span class="fc" id="L13">    private UserService userService = new UserService();</span>
+    public void mapEndpoints(Javalin app) {
+<span class="fc" id="L15">        app.post(&quot;/login&quot;, (ctx) -&gt; {</span>
+<span class="fc" id="L16">            LoginCredentials credentials = ctx.bodyAsClass(LoginCredentials.class);</span>
+
+<span class="fc bfc" id="L18" title="All 4 branches covered.">            if (credentials.getUsername() == null || credentials.getPassword() == null) {</span>
+<span class="fc" id="L19">                ctx.json(new Message(&quot;username and/or password was not provided!&quot;));</span>
+<span class="fc" id="L20">                ctx.status(400);</span>
+            } else {
+
+                try {
+<span class="fc" id="L24">                    User user = userService.login(credentials.getUsername(), credentials.getPassword());</span>
+
+                    // Create an HttpSession and associate the user object with that session
+                    // HttpSessions are used to track which client is sending a particular request
+<span class="fc" id="L28">                    HttpSession httpSession = ctx.req().getSession();</span>
+<span class="fc" id="L29">                    httpSession.setAttribute(&quot;user_info&quot;, user);</span>
+
+<span class="fc" id="L31">                    ctx.json(user);</span>
+<span class="fc" id="L32">                } catch (LoginException e) {</span>
+<span class="fc" id="L33">                    ctx.req().getSession().invalidate();</span>
+<span class="fc" id="L34">                    ctx.status(400);</span>
+<span class="fc" id="L35">                    ctx.json(new Message(e.getMessage()));</span>
+<span class="fc" id="L36">                }</span>
+
+            }
+<span class="fc" id="L39">        });</span>
+
+<span class="fc" id="L41">        app.get(&quot;/current-user&quot;, (ctx) -&gt; {</span>
+<span class="fc" id="L42">           HttpSession httpSession = ctx.req().getSession();</span>
+<span class="fc" id="L43">           User loggedInUser = (User) httpSession.getAttribute(&quot;user_info&quot;);</span>
+
+<span class="fc bfc" id="L45" title="All 2 branches covered.">           if (loggedInUser == null) {</span>
+<span class="fc" id="L46">               ctx.json(new Message(&quot;User is not logged in!&quot;));</span>
+<span class="fc" id="L47">               ctx.status(401); // 401 UNAUTHORIZED</span>
+           } else {
+<span class="fc" id="L49">               ctx.json(loggedInUser); // Object -&gt; JSON -&gt; Response body</span>
+           }
+<span class="fc" id="L51">        });</span>
+
+<span class="fc" id="L53">        app.post(&quot;/logout&quot;, (ctx) -&gt; {</span>
+<span class="nc" id="L54">            ctx.req().getSession().invalidate();</span>
+<span class="nc" id="L55">        });</span>
+<span class="fc" id="L56">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
