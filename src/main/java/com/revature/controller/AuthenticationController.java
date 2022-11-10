@@ -43,6 +43,7 @@ public class AuthenticationController {
 
            if (loggedInUser == null) {
                ctx.json(new Message("User is not logged in!"));
+               ctx.status(401); // 401 UNAUTHORIZED
            } else {
                ctx.json(loggedInUser); // Object -> JSON -> Response body
            }
