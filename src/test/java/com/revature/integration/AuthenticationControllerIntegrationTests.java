@@ -1,5 +1,6 @@
 package com.revature.integration;
 
+import com.revature.controller.AccountController;
 import com.revature.controller.AuthenticationController;
 import com.revature.dao.ConnectionUtility;
 import io.javalin.Javalin;
@@ -31,6 +32,8 @@ public class AuthenticationControllerIntegrationTests {
         app = Javalin.create();
         AuthenticationController authController = new AuthenticationController();
         authController.mapEndpoints(app); // map endpoints in AuthenticationController to the test Javalin object
+        AccountController accountController = new AccountController();
+        accountController.mapEndpoints(app);
     }
 
     @AfterEach

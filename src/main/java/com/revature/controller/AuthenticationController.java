@@ -52,6 +52,7 @@ public class AuthenticationController {
 
         app.post("/logout", (ctx) -> {
             ctx.req().getSession().invalidate();
+            ctx.status(204); // No content
         });
     }
 
