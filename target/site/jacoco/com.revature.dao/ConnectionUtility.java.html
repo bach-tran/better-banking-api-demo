@@ -17,7 +17,7 @@ import java.util.Properties;
 <span class="fc" id="L17">        boolean useH2 = Boolean.parseBoolean(properties.getProperty(&quot;use-h2&quot;));</span>
 
 <span class="pc bpc" id="L19" title="1 of 2 branches missed.">        if (useH2) { // Use H2 in-memory database</span>
-<span class="fc" id="L20">            return DriverManager.getConnection(&quot;jdbc:h2:mem:test&quot;);</span>
+<span class="fc" id="L20">            return DriverManager.getConnection(&quot;jdbc:h2:mem:test&quot;); // Connect to H2 database</span>
         } else { // Use Postgres database
 <span class="nc" id="L22">            String url = &quot;jdbc:postgresql://database-1.cifwcr7ybkhx.us-east-1.rds.amazonaws.com:5432/postgres&quot;;</span>
 <span class="nc" id="L23">            String username = &quot;postgres&quot;;</span>
@@ -29,53 +29,50 @@ import java.util.Properties;
     }
 
     public static void populateH2Database(Connection con) throws SQLException, IOException {
-<span class="fc" id="L32">        String createTableSql = &quot;create table bank_users (\n&quot; +</span>
+<span class="fc" id="L32">        String createBankUsersTableSql = &quot;create table bank_users (\n&quot; +</span>
                 &quot;\tid SERIAL primary key,\n&quot; +
                 &quot;\tusername VARCHAR(200) not null unique,\n&quot; +
                 &quot;\tpassword varchar(200) not null,\n&quot; +
                 &quot;\trole varchar(20) not null\n&quot; +
                 &quot;)&quot;;
 
-<span class="fc" id="L39">        String insertUsers = &quot;insert into bank_users (username, password, role)\n&quot; +</span>
+<span class="fc" id="L39">        String insertBankUsersSql = &quot;insert into bank_users (username, password, role)\n&quot; +</span>
                 &quot;values \n&quot; +
                 &quot;('admin123', 'password123', 'admin'),\n&quot; +
                 &quot;('customer123', 'test12345', 'customer')&quot;;
 
-<span class="fc" id="L44">        PreparedStatement ps1 = con.prepareStatement(createTableSql);</span>
-<span class="fc" id="L45">        ps1.executeUpdate();</span>
+<span class="fc" id="L44">        String createBankAccountsTableSql = &quot;create table bank_accounts (\n&quot; +</span>
+                &quot;\tid SERIAL primary key,\n&quot; +
+                &quot;\tbalance numeric(11, 2) not null check(balance &gt;= 0),\n&quot; +
+                &quot;\tbank_users_id INTEGER references bank_users(id) -- foreign key\n&quot; +
+                &quot;)&quot;;
 
-<span class="fc" id="L47">        PreparedStatement ps2 = con.prepareStatement(insertUsers);</span>
-<span class="fc" id="L48">        ps2.executeUpdate();</span>
+<span class="fc" id="L50">        String insertBankAccountsSql = &quot;insert into bank_accounts (balance, bank_users_id) \n&quot; +</span>
+                &quot;values \n&quot; +
+                &quot;(500.43, 2),\n&quot; +
+                &quot;(112.12, 2)&quot;;
 
-//        String selectUsers = &quot;select * from bank_users where username = ? and password = ?&quot;;
-//        PreparedStatement ps3 = con.prepareStatement(selectUsers);
-//        ps3.setString(1, &quot;john_doe&quot;);
-//        ps3.setString(2, &quot;password123&quot;);
-//        ResultSet rs = ps3.executeQuery();
-//
-//        if (rs.next()) {
-//            User user = new User();
-//            user.setId(rs.getInt(&quot;id&quot;));
-//            user.setUsername(rs.getString(&quot;username&quot;));
-//            user.setPassword(rs.getString(&quot;password&quot;));
-//            user.setRole(rs.getString(&quot;role&quot;));
-//
-//            System.out.println(user);
-//        }
-//
-//        UserDAO ud = new UserDAO();
-//        User u1 = ud.findUserByUsernameAndPassword(&quot;john_doe&quot;, &quot;password123&quot;);
-//        System.out.println(u1);
-<span class="fc" id="L69">    }</span>
+<span class="fc" id="L55">        PreparedStatement ps1 = con.prepareStatement(createBankUsersTableSql);</span>
+<span class="fc" id="L56">        ps1.execute();</span>
+
+<span class="fc" id="L58">        PreparedStatement ps2 = con.prepareStatement(insertBankUsersSql);</span>
+<span class="fc" id="L59">        ps2.execute();</span>
+
+<span class="fc" id="L61">        PreparedStatement ps3 = con.prepareStatement(createBankAccountsTableSql);</span>
+<span class="fc" id="L62">        ps3.execute();</span>
+
+<span class="fc" id="L64">        PreparedStatement ps4 = con.prepareStatement(insertBankAccountsSql);</span>
+<span class="fc" id="L65">        ps4.execute();</span>
+<span class="fc" id="L66">    }</span>
 
     // Ideally, a test should NOT rely on another test case. Therefore after each test case, we
     // want to start from scratch in the H2 database
     public static void clearH2Database(Connection con) throws SQLException {
-<span class="fc" id="L74">        String sql = &quot;DROP ALL OBJECTS&quot;; // H2 specific</span>
+<span class="fc" id="L71">        String sql = &quot;DROP ALL OBJECTS&quot;; // H2 specific</span>
 
-<span class="fc" id="L76">        Statement statement = con.createStatement();</span>
-<span class="fc" id="L77">        statement.executeUpdate(sql);</span>
-<span class="fc" id="L78">    }</span>
+<span class="fc" id="L73">        Statement statement = con.createStatement();</span>
+<span class="fc" id="L74">        statement.execute(sql);</span>
+<span class="fc" id="L75">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

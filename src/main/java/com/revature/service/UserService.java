@@ -10,6 +10,7 @@ import java.sql.SQLException;
 public class UserService {
 
     private UserDAO userDao = new UserDAO();
+
     public User login(String username, String password) throws SQLException, IOException {
         User user = userDao.findUserByUsernameAndPassword(username, password);
 

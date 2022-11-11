@@ -10,13 +10,14 @@ import java.sql.SQLException;
 <span class="fc" id="L10">public class UserService {</span>
 
 <span class="fc" id="L12">    private UserDAO userDao = new UserDAO();</span>
-    public User login(String username, String password) throws SQLException, IOException {
-<span class="fc" id="L14">        User user = userDao.findUserByUsernameAndPassword(username, password);</span>
 
-<span class="fc bfc" id="L16" title="All 2 branches covered.">        if (user == null) {</span>
-<span class="fc" id="L17">            throw new LoginException(&quot;Invalid login&quot;);</span>
+    public User login(String username, String password) throws SQLException, IOException {
+<span class="fc" id="L15">        User user = userDao.findUserByUsernameAndPassword(username, password);</span>
+
+<span class="fc bfc" id="L17" title="All 2 branches covered.">        if (user == null) {</span>
+<span class="fc" id="L18">            throw new LoginException(&quot;Invalid login&quot;);</span>
         } else {
-<span class="fc" id="L19">            return user;</span>
+<span class="fc" id="L20">            return user;</span>
         }
     }
 

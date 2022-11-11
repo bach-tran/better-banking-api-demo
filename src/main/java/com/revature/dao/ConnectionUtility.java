@@ -17,7 +17,7 @@ public class ConnectionUtility {
         boolean useH2 = Boolean.parseBoolean(properties.getProperty("use-h2"));
 
         if (useH2) { // Use H2 in-memory database
-            return DriverManager.getConnection("jdbc:h2:mem:test");
+            return DriverManager.getConnection("jdbc:h2:mem:test"); // Connect to H2 database
         } else { // Use Postgres database
             String url = "jdbc:postgresql://database-1.cifwcr7ybkhx.us-east-1.rds.amazonaws.com:5432/postgres";
             String username = "postgres";
@@ -29,43 +29,40 @@ public class ConnectionUtility {
     }
 
     public static void populateH2Database(Connection con) throws SQLException, IOException {
-        String createTableSql = "create table bank_users (\n" +
+        String createBankUsersTableSql = "create table bank_users (\n" +
                 "\tid SERIAL primary key,\n" +
                 "\tusername VARCHAR(200) not null unique,\n" +
                 "\tpassword varchar(200) not null,\n" +
                 "\trole varchar(20) not null\n" +
                 ")";
 
-        String insertUsers = "insert into bank_users (username, password, role)\n" +
+        String insertBankUsersSql = "insert into bank_users (username, password, role)\n" +
                 "values \n" +
                 "('admin123', 'password123', 'admin'),\n" +
                 "('customer123', 'test12345', 'customer')";
 
-        PreparedStatement ps1 = con.prepareStatement(createTableSql);
-        ps1.executeUpdate();
+        String createBankAccountsTableSql = "create table bank_accounts (\n" +
+                "\tid SERIAL primary key,\n" +
+                "\tbalance numeric(11, 2) not null check(balance >= 0),\n" +
+                "\tbank_users_id INTEGER references bank_users(id) -- foreign key\n" +
+                ")";
 
-        PreparedStatement ps2 = con.prepareStatement(insertUsers);
-        ps2.executeUpdate();
+        String insertBankAccountsSql = "insert into bank_accounts (balance, bank_users_id) \n" +
+                "values \n" +
+                "(500.43, 2),\n" +
+                "(112.12, 2)";
 
-//        String selectUsers = "select * from bank_users where username = ? and password = ?";
-//        PreparedStatement ps3 = con.prepareStatement(selectUsers);
-//        ps3.setString(1, "john_doe");
-//        ps3.setString(2, "password123");
-//        ResultSet rs = ps3.executeQuery();
-//
-//        if (rs.next()) {
-//            User user = new User();
-//            user.setId(rs.getInt("id"));
-//            user.setUsername(rs.getString("username"));
-//            user.setPassword(rs.getString("password"));
-//            user.setRole(rs.getString("role"));
-//
-//            System.out.println(user);
-//        }
-//
-//        UserDAO ud = new UserDAO();
-//        User u1 = ud.findUserByUsernameAndPassword("john_doe", "password123");
-//        System.out.println(u1);
+        PreparedStatement ps1 = con.prepareStatement(createBankUsersTableSql);
+        ps1.execute();
+
+        PreparedStatement ps2 = con.prepareStatement(insertBankUsersSql);
+        ps2.execute();
+
+        PreparedStatement ps3 = con.prepareStatement(createBankAccountsTableSql);
+        ps3.execute();
+
+        PreparedStatement ps4 = con.prepareStatement(insertBankAccountsSql);
+        ps4.execute();
     }
 
     // Ideally, a test should NOT rely on another test case. Therefore after each test case, we
@@ -74,7 +71,7 @@ public class ConnectionUtility {
         String sql = "DROP ALL OBJECTS"; // H2 specific
 
         Statement statement = con.createStatement();
-        statement.executeUpdate(sql);
+        statement.execute(sql);
     }
 
 }

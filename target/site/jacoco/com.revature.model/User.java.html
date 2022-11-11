@@ -12,12 +12,12 @@ public class User {
 <span class="fc" id="L12">    public User() {</span>
 <span class="fc" id="L13">    }</span>
 
-<span class="nc" id="L15">    public User(int id, String username, String password, String role) {</span>
-<span class="nc" id="L16">        this.id = id;</span>
-<span class="nc" id="L17">        this.username = username;</span>
-<span class="nc" id="L18">        this.password = password;</span>
-<span class="nc" id="L19">        this.role = role;</span>
-<span class="nc" id="L20">    }</span>
+<span class="fc" id="L15">    public User(int id, String username, String password, String role) {</span>
+<span class="fc" id="L16">        this.id = id;</span>
+<span class="fc" id="L17">        this.username = username;</span>
+<span class="fc" id="L18">        this.password = password;</span>
+<span class="fc" id="L19">        this.role = role;</span>
+<span class="fc" id="L20">    }</span>
 
     public int getId() {
 <span class="fc" id="L23">        return id;</span>
@@ -54,9 +54,9 @@ public class User {
     @Override
     public boolean equals(Object o) {
 <span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (this == o) return true;</span>
-<span class="pc bpc" id="L57" title="3 of 4 branches missed.">        if (o == null || getClass() != o.getClass()) return false;</span>
-<span class="nc" id="L58">        User user = (User) o;</span>
-<span class="nc bnc" id="L59" title="All 8 branches missed.">        return id == user.id &amp;&amp; Objects.equals(username, user.username) &amp;&amp; Objects.equals(password, user.password) &amp;&amp; Objects.equals(role, user.role);</span>
+<span class="pc bpc" id="L57" title="1 of 4 branches missed.">        if (o == null || getClass() != o.getClass()) return false;</span>
+<span class="fc" id="L58">        User user = (User) o;</span>
+<span class="pc bpc" id="L59" title="4 of 8 branches missed.">        return id == user.id &amp;&amp; Objects.equals(username, user.username) &amp;&amp; Objects.equals(password, user.password) &amp;&amp; Objects.equals(role, user.role);</span>
     }
 
     @Override
